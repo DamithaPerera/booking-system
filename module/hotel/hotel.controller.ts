@@ -3,14 +3,13 @@ import {getAllHotelsService} from "./hotel.service";
 import {ErrorResponse, SuccessResponse} from "../../util/responseHandler";
 
 
-
-
 export const getAllHotelsController = async (req: Request, res: Response) => {
     try {
-        const data = await getAllHotelsService()
+        const {checkIn, checkOut} = req.query
+        const data = await getAllHotelsService(checkIn, checkOut)
         return SuccessResponse(res, data, 'Hotel Details', 200);
     } catch (error) {
-        return ErrorResponse(res, { message: error }, 500);
+        return ErrorResponse(res, {message: error}, 500);
     }
 
 }
