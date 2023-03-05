@@ -1,0 +1,17 @@
+{
+  "data": [
+    {
+      "HotelId": 1,
+      "RoomId": 100001,
+      "CheckIn": "2023-03-10T00:00:00Z",
+      "CheckOut": "2023-03-18T00:00:00Z",
+      "CustomerDetails": {
+        "FirstName": "Damitha",
+        "LastName": "Perera",
+        "Email": "damitha@test.com",
+        "PhoneNumber": "+94710401409",
+        "Payment": "SUCCESS"
+      }
+    }
+  ]
+}
