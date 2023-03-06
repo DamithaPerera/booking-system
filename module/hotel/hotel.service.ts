@@ -1,6 +1,14 @@
-import {createBookingRepo, getAllBookingRepo, getAllHotelsRepo} from "./hotel.repository";
+import {
+    createBookingRepo,
+    getAllBookingRepo,
+    getAllHotelsRepo,
+    getBookingRepo,
+    updateBookingRepo
+} from "./hotel.repository";
 import {Booking} from "../../interface/Booking";
 import {Hotel} from "../../interface/hotel";
+import path from 'path';
+import fs from 'fs';
 
 
 export const getAllHotelsService = async (checkIn: string, checkOut: string) => {
@@ -30,13 +38,13 @@ export const getAllHotelsService = async (checkIn: string, checkOut: string) => 
 };
 
 export const creatHotelBookingService = async (requestBody: Booking) => {
-    const {Booking}  = await getAllBookingRepo();
-    const { Hotels } = await getAllHotelsRepo();
+    const {Booking} = await getAllBookingRepo();
+    const {Hotels} = await getAllHotelsRepo();
 
     const hotelObj: Hotel[] = Hotels;
     const bookingObj: Booking[] = Booking;
 
-    const data = validateBooking(requestBody, hotelObj, bookingObj );
+    const data = validateBooking(requestBody, hotelObj, bookingObj);
     if (data) {
         console.log('sd')
         await createBookingRepo(requestBody)
@@ -73,6 +81,35 @@ function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[])
     }
 
     return true;
+}
+const bookingsPath = path.join(__dirname, '..', '..', 'data', 'booking.data.json');
+
+
+export const updateHotelBookingService = async (requestBody: Booking, hotelId: number, roomId: number) => {
+    // const {Booking} = await getAllBookingRepo();
+    // const {Hotels} = await getAllHotelsRepo();
+    const bookings =  await getBookingRepo();
+
+    // const bookingsJSON = fs.readFileSync(bookingsPath, 'utf-8');
+    // const bookings = JSON.parse(bookingsJSON);
+
+    // Find the index of the booking to update based on HotelId and RoomId
+    const bookingIndex = bookings.Booking.findIndex((b: Booking) => b.HotelId === hotelId && b.RoomId === roomId);
+
+    if (bookingIndex === -1) {
+        return 'Booking not found';
+    }
+
+   requestBody.HotelId = hotelId
+   requestBody.RoomId = roomId
+
+    // Update the booking at the found index
+    bookings.Booking[bookingIndex] = requestBody;
+
+    // Write the updated JSON back to the file
+    const updatedJSON = JSON.stringify(bookings, null, 2);
+    await updateBookingRepo(updatedJSON);
+    return requestBody;
 }
 
 

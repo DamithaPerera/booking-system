@@ -24,3 +24,12 @@ export const createBookingRepo = async (requestBody: Booking) => {
 
     fs.writeFileSync(bookingsPath, updatedJSON);
 };
+
+export const getBookingRepo = async () => {
+    const bookingsJSON = fs.readFileSync(bookingsPath, 'utf-8');
+    return JSON.parse(bookingsJSON)
+};
+
+export const updateBookingRepo = async (updatedJSON: string | NodeJS.ArrayBufferView) => {
+    return fs.writeFileSync(bookingsPath, updatedJSON);
+};
