@@ -3,6 +3,7 @@
     {
       "HotelId": 1,
       "RoomId": 100001,
+      "BookingId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
       "CheckIn": "2023-03-10T00:00:00Z",
       "CheckOut": "2023-03-18T00:00:00Z",
       "CustomerDetails": {
@@ -16,6 +17,7 @@
     {
       "HotelId": 1,
       "RoomId": 100002,
+      "BookingId": "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed",
       "CheckIn": "2023-03-20T00:00:00Z",
       "CheckOut": "2023-04-18T00:00:00Z",
       "CustomerDetails": {

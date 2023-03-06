@@ -33,3 +33,8 @@ export const getBookingRepo = async () => {
 export const updateBookingRepo = async (updatedJSON: string | NodeJS.ArrayBufferView) => {
     return fs.writeFileSync(bookingsPath, updatedJSON);
 };
+
+export const cancelBookingRepo = async (bookingData: any) => {
+    return fs.writeFileSync(bookingsPath, JSON.stringify(bookingData, null, 2));
+
+};

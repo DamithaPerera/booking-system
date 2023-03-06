@@ -2,6 +2,7 @@
 export interface Booking {
     HotelId: number;
     RoomId: number;
+    BookingId: string;
     CheckIn: string;
     CheckOut: string;
     CustomerDetails: {

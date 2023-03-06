@@ -1,4 +1,5 @@
 import {
+    cancelBookingRepo,
     createBookingRepo,
     getAllBookingRepo,
     getAllHotelsRepo,
@@ -7,6 +8,7 @@ import {
 } from "./hotel.repository";
 import {Booking} from "../../interface/Booking";
 import {Hotel} from "../../interface/hotel";
+import {v4 as uuidv4} from 'uuid';
 import path from 'path';
 import fs from 'fs';
 
@@ -46,10 +48,13 @@ export const creatHotelBookingService = async (requestBody: Booking) => {
 
     const data = validateBooking(requestBody, hotelObj, bookingObj);
     if (data) {
-        console.log('sd')
+        requestBody.BookingId = uuidv4();
+        console.log('requestBody', requestBody)
         await createBookingRepo(requestBody)
     }
-    return data
+    return {
+        "Booking Id": requestBody.BookingId
+    }
 }
 
 function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[]): boolean {
@@ -82,26 +87,19 @@ function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[])
 
     return true;
 }
-const bookingsPath = path.join(__dirname, '..', '..', 'data', 'booking.data.json');
 
-
-export const updateHotelBookingService = async (requestBody: Booking, hotelId: number, roomId: number) => {
-    // const {Booking} = await getAllBookingRepo();
-    // const {Hotels} = await getAllHotelsRepo();
-    const bookings =  await getBookingRepo();
-
-    // const bookingsJSON = fs.readFileSync(bookingsPath, 'utf-8');
-    // const bookings = JSON.parse(bookingsJSON);
-
+export const updateHotelBookingService = async (requestBody: Booking, hotelId: number, roomId: number, bookingId: string) => {
+    const bookings = await getBookingRepo();
     // Find the index of the booking to update based on HotelId and RoomId
-    const bookingIndex = bookings.Booking.findIndex((b: Booking) => b.HotelId === hotelId && b.RoomId === roomId);
+    const bookingIndex = bookings.Booking.findIndex((b: Booking) => b.HotelId === hotelId && b.RoomId === roomId && b.BookingId === bookingId);
 
     if (bookingIndex === -1) {
-        return 'Booking not found';
+        throw new Error(`Booking not found for hotelId ${hotelId}, roomId ${roomId} and bookingId ${bookingId}`);
     }
 
-   requestBody.HotelId = hotelId
-   requestBody.RoomId = roomId
+    requestBody.HotelId = hotelId
+    requestBody.RoomId = roomId
+    requestBody.BookingId = bookingId
 
     // Update the booking at the found index
     bookings.Booking[bookingIndex] = requestBody;
@@ -113,3 +111,16 @@ export const updateHotelBookingService = async (requestBody: Booking, hotelId: n
 }
 
 
+export const cancelHotelBookingService = async (hotelId: number, roomId: number, bookingId: string) => {
+    const bookingData = await getBookingRepo();
+    const index = bookingData.Booking.findIndex(
+        (booking: Booking) => booking.HotelId === hotelId && booking.RoomId === roomId && booking.BookingId === bookingId
+    );
+
+    if (index === -1) {
+        throw new Error(`Booking not found for hotelId ${hotelId}, roomId ${roomId} and bookingId ${bookingId}`);
+    }
+
+    bookingData.Booking.splice(index, 1);
+    await cancelBookingRepo(bookingData)
+}
