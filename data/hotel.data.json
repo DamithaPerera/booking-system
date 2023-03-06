@@ -27,7 +27,7 @@
           "SmokingAllowed": true
         },
         {
-          "RoomId": 100002,
+          "RoomId": 100003,
           "Description": "Deluxe Room, 2 Double Beds (City View)",
           "Type": "Deluxe Room",
           "BaseRate": 150.99,
