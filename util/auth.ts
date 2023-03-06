@@ -1,6 +1,7 @@
 import {NextFunction, Request, Response} from 'express';
 import {token} from "../util/token.json";
 import {ErrorResponse} from "./responseHandler";
+import {HttpStatusCode} from './statusCode';
 
 /**
  * Simple Authentication
@@ -13,7 +14,7 @@ export const authRequest = async (req: Request, res: Response, next: NextFunctio
 
     const authHeader = req.headers["authorization"]?.replace("Bearer", "").trim();
     if (!authHeader || authHeader !== token) {
-        return ErrorResponse(res, {message: authHeader ? 'Invalid Token' : 'Missing Token'}, 403);
+        return ErrorResponse(res, {message: authHeader ? 'Invalid Token' : 'Missing Token'}, HttpStatusCode.FORBIDDEN);
     }
     next();
 }

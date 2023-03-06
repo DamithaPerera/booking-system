@@ -1,6 +1,8 @@
-const Joi = require('joi').extend(require('@joi/date'));
+import {HttpStatusCode} from "../../util/statusCode";
 import {NextFunction, Request, Response} from 'express';
 import {ErrorResponse} from "../../util/responseHandler";
+
+const Joi = require('joi').extend(require('@joi/date'));
 import moment from 'moment';
 
 
@@ -13,7 +15,7 @@ export const getAllHotelsValidation = (req: Request, res: Response, next: NextFu
 
     const result = schema.validate(req.query);
     if (result.error) {
-        return ErrorResponse(res, {message: result.error.message}, 422);
+        return ErrorResponse(res, {message: result.error.message}, HttpStatusCode.VALIDATION);
     } else {
         next()
     }
@@ -38,7 +40,7 @@ export const creatHotelBookingValidation = (req: Request, res: Response, next: N
 
     const result = schema.validate(req.body);
     if (result.error) {
-        return ErrorResponse(res, {message: result.error.message}, 422);
+        return ErrorResponse(res, {message: result.error.message}, HttpStatusCode.VALIDATION);
     } else {
         next()
     }
@@ -60,7 +62,7 @@ export const updateHotelBookingValidation = (req: Request, res: Response, next: 
 
     const result = schema.validate(req.body);
     if (result.error) {
-        return ErrorResponse(res, {message: result.error.message}, 422);
+        return ErrorResponse(res, {message: result.error.message}, HttpStatusCode.VALIDATION);
     } else {
         next()
     }
@@ -75,7 +77,7 @@ export const cancelHotelBookingValidation = (req: Request, res: Response, next: 
 
     const result = schema.validate(req.params);
     if (result.error) {
-        return ErrorResponse(res, {message: result.error.message}, 422);
+        return ErrorResponse(res, {message: result.error.message}, HttpStatusCode.VALIDATION);
     }
     next()
 
