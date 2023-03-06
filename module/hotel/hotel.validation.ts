@@ -64,5 +64,19 @@ export const updateHotelBookingValidation = (req: Request, res: Response, next: 
     } else {
         next()
     }
+};
+
+export const cancelHotelBookingValidation = (req: Request, res: Response, next: NextFunction) => {
+    const schema = Joi.object({
+        hotelId: Joi.number().required(),
+        roomId: Joi.number().required(),
+        bookingId: Joi.string().required()
+    });
+
+    const result = schema.validate(req.params);
+    if (result.error) {
+        return ErrorResponse(res, {message: result.error.message}, 422);
+    }
+    next()
 
 };
