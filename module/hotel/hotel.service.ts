@@ -38,46 +38,41 @@ export const getAllHotelsService = async (checkIn: string, checkOut: string) => 
 };
 
 export const creatHotelBookingService = async (requestBody: Booking) => {
-    const {Booking, Hotels} = await getCacheForBookingsAndHotels()
-    const data = validateBooking(requestBody, Hotels, Booking);
-    if (data) {
-        requestBody.BookingId = uuidv4();
-        await createBookingRepo(requestBody);
-    }
+    const {Booking, Hotels} = await getCacheForBookingsAndHotels();
+    validateBooking(requestBody, Hotels, Booking);
+    requestBody.BookingId = uuidv4();
+    await createBookingRepo(requestBody);
     return {
         "Booking Id": requestBody.BookingId
     }
 }
 
-function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[]): boolean {
-    const hotel = hotels.find((h) => h.HotelId === booking.HotelId);
+function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[]) {
+    const hotel = hotels.find(h => h.HotelId === booking.HotelId);
     if (!hotel) {
-        throw new Error(`Error: Hotel with ID ${booking.HotelId} does not exist.`)
+        throw new Error(`Error: Hotel with ID ${booking.HotelId} does not exist.`);
     }
 
-    const room = hotel.Rooms.find((r) => r.RoomId === booking.RoomId);
+    const room = hotel.Rooms.find(r => r.RoomId === booking.RoomId);
     if (!room) {
-        throw new Error(`Error: Room with ID ${booking.RoomId} does not exist in hotel ${booking.HotelId}.`)
+        throw new Error(`Error: Room with ID ${booking.RoomId} does not exist in hotel ${booking.HotelId}.`);
     }
 
-    const conflictingBooking = bookings.find(
-        (b) =>
-            b.HotelId === booking.HotelId &&
-            b.RoomId === booking.RoomId &&
-            ((new Date(b.CheckIn) >= new Date(booking.CheckIn) && new Date(b.CheckIn) < new Date(booking.CheckOut)) ||
-                (new Date(b.CheckOut) > new Date(booking.CheckIn) && new Date(b.CheckOut) <= new Date(booking.CheckOut)))
+    const conflictingBooking = bookings.find(b =>
+        b.HotelId === booking.HotelId &&
+        b.RoomId === booking.RoomId &&
+        ((new Date(b.CheckIn) >= new Date(booking.CheckIn) && new Date(b.CheckIn) < new Date(booking.CheckOut)) ||
+            (new Date(b.CheckOut) > new Date(booking.CheckIn) && new Date(b.CheckOut) <= new Date(booking.CheckOut)))
     );
     if (conflictingBooking) {
-        throw new Error(`Error: Room with ID ${booking.RoomId} in hotel ${booking.HotelId} is not available during the specified date range.`)
+        throw new Error(`Error: Room with ID ${booking.RoomId} in hotel ${booking.HotelId} is not available during the specified date range.`);
     }
 
     const checkInDate = new Date(booking.CheckIn);
     const checkOutDate = new Date(booking.CheckOut);
     if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime()) || checkInDate >= checkOutDate) {
-        throw new Error(`Error: Invalid date range specified.`)
+        throw new Error(`Error: Invalid date range specified.`);
     }
-
-    return true;
 }
 
 export const updateHotelBookingService = async (requestBody: Booking, hotelId: number, roomId: number, bookingId: string) => {
