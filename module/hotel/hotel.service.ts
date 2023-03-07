@@ -9,13 +9,31 @@ import {
 import {Booking} from "../../interface/Booking";
 import {Hotel} from "../../interface/hotel";
 import {v4 as uuidv4} from 'uuid';
-import path from 'path';
-import fs from 'fs';
+import cache from "../../util/cache";
 
 
 export const getAllHotelsService = async (checkIn: string, checkOut: string) => {
-    const {Booking} = await getAllBookingRepo();
-    const {Hotels} = await getAllHotelsRepo()
+    // Declare the variables before the if statement
+    let Booking: any[] = [];
+    let Hotels: any[] = [];
+
+    // Check the cache first
+    let getHotelCache = cache.get("getHotels");
+    let getBookingCache = cache.get("getBookings");
+
+    if (!getHotelCache || !getBookingCache) {
+        // If the data is not cached, fetch it from the repository
+        let result = await Promise.all([getAllBookingRepo(), getAllHotelsRepo()]);
+        Booking = result[0].Booking;
+        Hotels = result[1].Hotels;
+
+        // Cache the data for future use
+        cache.set("getBookings", Booking);
+        cache.set("getHotels", Hotels);
+    } else {
+        Booking = getBookingCache;
+        Hotels = getHotelCache;
+    }
 
     // Define the date range to check availability
     const checkInDate = new Date(checkIn);
@@ -36,7 +54,7 @@ export const getAllHotelsService = async (checkIn: string, checkOut: string) => 
     return Hotels.map((hotel) => ({
         ...hotel,
         Rooms: hotel.Rooms.filter((room) => !bookedRoomIds.includes(room.RoomId)),
-    }))
+    }));
 };
 
 export const creatHotelBookingService = async (requestBody: Booking) => {
