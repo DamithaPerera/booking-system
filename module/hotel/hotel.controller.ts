@@ -25,7 +25,7 @@ export const creatHotelBookingController = async (req: Request, res: Response) =
         const data = await creatHotelBookingService(requestBody)
         return SuccessResponse(res, data, 'Booking Created Successfully', HttpStatusCode.CREATED);
     } catch (error) {
-        return ErrorResponse(res, error, HttpStatusCode.BAD_REQUEST);
+        return ErrorResponse(res, {message: error}, HttpStatusCode.BAD_REQUEST);
     }
 }
 

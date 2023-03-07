@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { getAllHotelsService } from "../module/hotel/hotel.service";
-import { getAllHotelsController } from "../module/hotel/hotel.controller";
+import { creatHotelBookingService, getAllHotelsService } from "../module/hotel/hotel.service";
+import { creatHotelBookingController, getAllHotelsController } from "../module/hotel/hotel.controller";
 
 
 jest.mock('../module/hotel/hotel.service');
@@ -41,6 +41,59 @@ describe('getAllHotelsController', () => {
     (getAllHotelsService as jest.Mock).mockRejectedValue(errorMessage);
 
     await getAllHotelsController(<Request>req, <Response>res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      data: {
+        'errorMessage': errorMessage
+      },
+    });
+  });
+});
+
+
+jest.mock('../module/hotel/hotel.service');
+
+describe('creatHotelBookingController', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+
+  beforeEach(() => {
+    req = {
+      body: {
+        hotelName: 'Hotel A',
+        checkIn: '2023-03-07',
+        checkOut: '2023-03-09',
+        guestName: 'John Doe',
+        guestEmail: 'johndoe@example.com',
+      },
+    };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+    };
+  });
+
+  it('should create hotel booking and return success response', async () => {
+    const expectedData = { bookingId: 'abc123', hotelName: 'Hotel A', checkIn: '2023-03-07', checkOut: '2023-03-09' };
+    (creatHotelBookingService as jest.Mock).mockResolvedValue(expectedData);
+
+    await creatHotelBookingController(<Request>req, <Response>res);
+
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith({
+      success: true,
+      message: 'Booking Created Successfully',
+      data: expectedData,
+    });
+  });
+
+  it('should return error response on failure', async () => {
+    const errorMessage = 'Invalid guest email';
+    (creatHotelBookingService as jest.Mock).mockRejectedValue(errorMessage);
+
+    await creatHotelBookingController(<Request>req, <Response>res);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
