@@ -46,6 +46,6 @@ export const cancelHotelBookingController = async (req: Request, res: Response) 
         const data = await cancelHotelBookingService(+hotelId, +roomId, bookingId)
         return SuccessResponse(res, data, 'Booking Canceled Successfully', HttpStatusCode.OK);
     } catch (error) {
-        return ErrorResponse(res, error, HttpStatusCode.BAD_REQUEST);
+        return ErrorResponse(res, {message: error}, HttpStatusCode.BAD_REQUEST);
     }
 }

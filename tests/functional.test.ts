@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
 import {
+  cancelHotelBookingService,
   creatHotelBookingService,
   getAllHotelsService,
   updateHotelBookingService
 } from "../module/hotel/hotel.service";
 import {
+  cancelHotelBookingController,
   creatHotelBookingController,
   getAllHotelsController,
   updateHotelBookingController
@@ -172,3 +174,53 @@ describe('updateHotelBookingController', () => {
   });
 });
 
+
+jest.mock('../module/hotel/hotel.service');
+
+describe('cancelHotelBookingController', () => {
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+
+  beforeEach(() => {
+    req = {
+      params: {
+        hotelId: '1',
+        roomId: '2',
+        bookingId: 'abc123',
+      },
+    };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+    };
+  });
+
+  it('should cancel hotel booking and return success response', async () => {
+    const expectedData = { bookingId: 'abc123', hotelName: 'Hotel A', checkIn: '2023-03-07', checkOut: '2023-03-09' };
+    (cancelHotelBookingService as jest.Mock).mockResolvedValue(expectedData);
+
+    await cancelHotelBookingController(<Request>req, <Response>res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      success: true,
+      message: 'Booking Canceled Successfully',
+      data: expectedData,
+    });
+  });
+
+  it('should return error response on failure', async () => {
+    const errorMessage = 'Booking not found';
+    (cancelHotelBookingService as jest.Mock).mockRejectedValue(errorMessage);
+
+    await cancelHotelBookingController(<Request>req, <Response>res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      data: {
+        'errorMessage': errorMessage
+      },
+    });
+  });
+});
