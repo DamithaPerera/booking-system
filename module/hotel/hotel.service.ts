@@ -7,6 +7,7 @@ import {
 } from "./hotel.repository";
 import {Booking} from "../../interface/Booking";
 import {Hotel} from "../../interface/hotel";
+import {BookingData} from "../../interface/bookingData";
 import {v4 as uuidv4} from 'uuid';
 import cache from "../../util/cache";
 
@@ -80,7 +81,7 @@ function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[])
 }
 
 export const updateHotelBookingService = async (requestBody: Booking, hotelId: number, roomId: number, bookingId: string) => {
-    const bookings = await getCacheForBookingsAndHotels();
+    const bookings: BookingData = await getCacheForBookingsAndHotels();
     // Find the index of the booking to update based on HotelId and RoomId
     const bookingIndex = bookings.Booking.findIndex((b: Booking) => b.HotelId === hotelId && b.RoomId === roomId && b.BookingId === bookingId);
 
@@ -93,7 +94,6 @@ export const updateHotelBookingService = async (requestBody: Booking, hotelId: n
     bookings.Booking[bookingIndex].CheckOut = requestBody.CheckOut;
     bookings.Booking[bookingIndex].CustomerDetails = requestBody.CustomerDetails;
 
-    // @ts-ignore
     delete bookings.Hotels
 
     // Write the updated JSON back to the file
@@ -106,7 +106,7 @@ export const updateHotelBookingService = async (requestBody: Booking, hotelId: n
 
 
 export const cancelHotelBookingService = async (hotelId: number, roomId: number, bookingId: string) => {
-    const bookingData = await getCacheForBookingsAndHotels();
+    const bookingData: BookingData = await getCacheForBookingsAndHotels();
     const index = bookingData.Booking.findIndex(
         (booking: Booking) => booking.HotelId === hotelId && booking.RoomId === roomId && booking.BookingId === bookingId
     );
@@ -114,8 +114,8 @@ export const cancelHotelBookingService = async (hotelId: number, roomId: number,
     if (index === -1) {
         throw new Error(`Booking not found for hotelId ${hotelId}, roomId ${roomId} and bookingId ${bookingId}`);
     }
-    // @ts-ignore
-    delete bookingData.Hotels
+
+    delete bookingData.Hotels;
     bookingData.Booking.splice(index, 1);
     await cancelBookingRepo(bookingData)
 }
