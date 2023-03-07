@@ -1,0 +1,6 @@
+**/*.js
+**/*.txt
+**/*.md
+
+# Ignore the index.ts file
+**/index.ts
