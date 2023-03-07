@@ -10,7 +10,9 @@ export const getAllHotelsValidation = (req: Request, res: Response, next: NextFu
 
     const schema = Joi.object({
         checkIn: Joi.date().format('YYYY-MM-DD').greater('now').required(),
-        checkOut: Joi.date().format('YYYY-MM-DD').greater(Joi.ref('checkIn')).required()
+        checkOut: Joi.date().format('YYYY-MM-DD').greater(Joi.ref('checkIn')).required(),
+        page: Joi.number().min(1).required(),
+        perPage: Joi.number().max(10).required(),
     });
 
     const result = schema.validate(req.query);

@@ -11,8 +11,10 @@ import {HttpStatusCode} from "../../util/statusCode";
 
 export const getAllHotelsController = async (req: Request, res: Response) => {
     try {
-        const {checkIn, checkOut} = req.query
-        const data = await getAllHotelsService(<string>checkIn, <string>checkOut)
+        const {checkIn, checkOut, page, perPage} = req.query
+        const currentPage = Number(page)
+        const pageLimit = Number(perPage)
+        const data = await getAllHotelsService(<string>checkIn, <string>checkOut, currentPage, pageLimit)
         return SuccessResponse(res, data, 'Hotel Details', HttpStatusCode.OK);
     } catch (error) {
         return ErrorResponse(res, {message: error}, HttpStatusCode.BAD_REQUEST);

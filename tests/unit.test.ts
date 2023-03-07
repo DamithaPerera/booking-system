@@ -58,7 +58,7 @@ describe("getAllHotelsService", () => {
     ];
 
     // Call the function with the mock cache
-    const output = await getAllHotelsService(checkInDate, checkOutDate);
+    const output = await getAllHotelsService(checkInDate, checkOutDate, 1, 10);
     // Assert that the output matches the expected output
     expect(output).toEqual(expect.any(Array));
   });

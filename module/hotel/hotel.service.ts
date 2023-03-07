@@ -12,29 +12,32 @@ import {v4 as uuidv4} from 'uuid';
 import cache from "../../util/cache";
 
 
-export const getAllHotelsService = async (checkIn: string, checkOut: string) => {
-    const {Booking, Hotels} = await getCacheForBookingsAndHotels()
+export const getAllHotelsService = async (checkIn: string, checkOut: string, page: number, perPage: number) => {
+    const { Booking, Hotels } = await getCacheForBookingsAndHotels();
 
     // Define the date range to check availability
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
 
     // Find all booked room IDs within the date range
-    const bookedRoomIds = Booking
-        .filter((booking) => {
-            const bookingCheckInDate = new Date(booking.CheckIn);
-            const bookingCheckOutDate = new Date(booking.CheckOut);
-            return (
-                bookingCheckInDate < checkOutDate && bookingCheckOutDate > checkInDate
-            );
-        })
-        .map((booking) => booking.RoomId);
+    const bookedRoomIds = Booking.filter((booking) => {
+        const bookingCheckInDate = new Date(booking.CheckIn);
+        const bookingCheckOutDate = new Date(booking.CheckOut);
+        return bookingCheckInDate < checkOutDate && bookingCheckOutDate > checkInDate;
+    }).map((booking) => booking.RoomId);
 
     // Filter out all rooms that are already booked within the date range
-    return Hotels.map((hotel) => ({
+    const availableHotels = Hotels.map((hotel) => ({
         ...hotel,
         Rooms: hotel.Rooms.filter((room) => !bookedRoomIds.includes(room.RoomId)),
     }));
+
+    // Calculate the start and end indexes for the current page
+    const startIndex = (page - 1) * perPage;
+    const endIndex = startIndex + perPage;
+
+    // Return the hotels for the current page
+    return availableHotels.slice(startIndex, endIndex);
 };
 
 export const creatHotelBookingService = async (requestBody: Booking) => {
