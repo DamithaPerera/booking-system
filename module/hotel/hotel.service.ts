@@ -116,7 +116,7 @@ export const cancelHotelBookingService = async (hotelId: number, roomId: number,
 }
 
 
-const getCacheForBookingsAndHotels = async () => {
+export const getCacheForBookingsAndHotels = async () => {
     const getHotelCache = cache.get<Hotel[]>("getHotels");
     const getBookingCache = cache.get<Booking[]>("getBookings");
 

@@ -1,5 +1,8 @@
-import { getAllHotelsService } from '../module/hotel/hotel.service';
-import { array } from "joi";
+import { creatHotelBookingService, getAllHotelsService } from "../module/hotel/hotel.service";
+import { createBookingRepo } from "../module/hotel/hotel.repository";
+import {v4 as uuidv4} from 'uuid';
+import { Booking } from "../interface/Booking";
+
 
 describe('getAllHotelsService', () => {
   it('returns all hotels with available rooms within the specified date range', async () => {
@@ -59,3 +62,62 @@ describe('getAllHotelsService', () => {
     expect(output).toEqual(expect.any(Array))
   });
 });
+
+// const mockBooking: Booking = {
+//   HotelId: 1,
+//   BookingId: 'def456',
+//   RoomId: 1,
+//   CheckIn: '2023-03-01',
+//   CheckOut: '2023-03-03',
+//   CustomerDetails: {
+//     FirstName: 'John',
+//     LastName: 'Doe',
+//     Email: 'john.doe@example.com',
+//     PhoneNumber: '123-456-7890',
+//     Payment: 'credit_card',
+//   },
+// };
+//
+// jest.mock('../module/hotel/hotel.service', () => ({
+//   getCacheForBookingsAndHotels: jest.fn(() => ({
+//     Booking: [],
+//     Hotels: [{ id: 1, name: 'Test Hotel' }],
+//   })),
+// }));
+//
+// jest.mock('../module/hotel/hotel.repository', () => ({
+//   createBookingRepo: jest.fn(),
+// }));
+//
+// describe('createHotelBookingService', () => {
+//   it('should create a booking and return the booking ID', async () => {
+//     const { createHotelBookingService } = require('../module/hotel/hotel.service');
+//
+//     jest.mock('uuid', () => ({
+//       v4: jest.fn(() => '12345'),
+//     }));
+//
+//     const result = await createHotelBookingService(mockBooking);
+//
+//     expect(result).toEqual({ 'Booking Id': '12345' });
+//     expect(uuidv4).toHaveBeenCalled();
+//     expect(createBookingRepo).toHaveBeenCalledWith({
+//       ...mockBooking,
+//       BookingId: '12345',
+//     });
+//   });
+//
+//   it('should throw an error if the booking is invalid', async () => {
+//     const { createHotelBookingService } = require('../module/hotel/hotel.service');
+//
+//     // expect.assertions(1);
+//     try {
+//       await createHotelBookingService({});
+//     } catch (e) {
+//       console.log('ddd', e)
+//       // expect(e).toEqual('Booking is invalid');
+//     }
+//   });
+// });
+
+
