@@ -3,7 +3,6 @@ import {
     createBookingRepo,
     getAllBookingRepo,
     getAllHotelsRepo,
-    getBookingRepo,
     updateBookingRepo
 } from "./hotel.repository";
 import {Booking} from "../../interface/Booking";
@@ -49,34 +48,6 @@ export const creatHotelBookingService = async (requestBody: Booking) => {
     }
 }
 
-
-const getCacheForBookingsAndHotels = async () => {
-    let getHotelCache = cache.get("getHotels");
-    let getBookingCache = cache.get("getBookings");
-
-    let Booking: Booking[] = [];
-    let Hotels: Hotel[] = [];
-
-    if (!getHotelCache || !getBookingCache) {
-        let data = await Promise.all([getAllBookingRepo(), getAllHotelsRepo()]);
-        Booking = data[0].Booking;
-        Hotels = data[1].Hotels;
-
-        cache.set("getBookings", Booking);
-        cache.set("getHotels", Hotels);
-    } else {
-        // @ts-ignore
-        Booking = getBookingCache;
-        // @ts-ignore
-        Hotels = getHotelCache;
-    }
-
-    return {
-        Booking, Hotels
-    }
-
-};
-
 function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[]): boolean {
     const hotel = hotels.find((h) => h.HotelId === booking.HotelId);
     if (!hotel) {
@@ -109,7 +80,7 @@ function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[])
 }
 
 export const updateHotelBookingService = async (requestBody: Booking, hotelId: number, roomId: number, bookingId: string) => {
-    const bookings = await getBookingRepo();
+    const bookings = await getCacheForBookingsAndHotels();
     // Find the index of the booking to update based on HotelId and RoomId
     const bookingIndex = bookings.Booking.findIndex((b: Booking) => b.HotelId === hotelId && b.RoomId === roomId && b.BookingId === bookingId);
 
@@ -117,22 +88,25 @@ export const updateHotelBookingService = async (requestBody: Booking, hotelId: n
         throw new Error(`Booking not found for hotelId ${hotelId}, roomId ${roomId} and bookingId ${bookingId}`);
     }
 
-    requestBody.HotelId = hotelId
-    requestBody.RoomId = roomId
-    requestBody.BookingId = bookingId
+    // Update the fields of the booking at the found index
+    bookings.Booking[bookingIndex].CheckIn = requestBody.CheckIn;
+    bookings.Booking[bookingIndex].CheckOut = requestBody.CheckOut;
+    bookings.Booking[bookingIndex].CustomerDetails = requestBody.CustomerDetails;
 
-    // Update the booking at the found index
-    bookings.Booking[bookingIndex] = requestBody;
+    // @ts-ignore
+    delete bookings.Hotels
 
     // Write the updated JSON back to the file
     const updatedJSON = JSON.stringify(bookings, null, 2);
     await updateBookingRepo(updatedJSON);
-    return requestBody;
+
+    return bookings.Booking[bookingIndex];
 }
 
 
+
 export const cancelHotelBookingService = async (hotelId: number, roomId: number, bookingId: string) => {
-    const bookingData = await getBookingRepo();
+    const bookingData = await getCacheForBookingsAndHotels();
     const index = bookingData.Booking.findIndex(
         (booking: Booking) => booking.HotelId === hotelId && booking.RoomId === roomId && booking.BookingId === bookingId
     );
@@ -140,7 +114,32 @@ export const cancelHotelBookingService = async (hotelId: number, roomId: number,
     if (index === -1) {
         throw new Error(`Booking not found for hotelId ${hotelId}, roomId ${roomId} and bookingId ${bookingId}`);
     }
-
+    // @ts-ignore
+    delete bookingData.Hotels
     bookingData.Booking.splice(index, 1);
     await cancelBookingRepo(bookingData)
 }
+
+
+const getCacheForBookingsAndHotels = async () => {
+    const getHotelCache = cache.get<Hotel[]>("getHotels");
+    const getBookingCache = cache.get<Booking[]>("getBookings");
+
+    let Booking: Booking[] = getBookingCache ?? [];
+    let Hotels: Hotel[] = getHotelCache ?? [];
+
+    if (!getHotelCache || !getBookingCache) {
+        const [bookingData, hotelsData] = await Promise.all([
+            getAllBookingRepo(),
+            getAllHotelsRepo(),
+        ]);
+
+        Booking = bookingData.Booking;
+        Hotels = hotelsData.Hotels;
+
+        cache.set("getBookings", Booking);
+        cache.set("getHotels", Hotels);
+    }
+
+    return {Booking, Hotels};
+};

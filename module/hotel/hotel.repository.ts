@@ -2,6 +2,7 @@ import hotelData from '../../data/hotel.data.json';
 import {Booking} from "../../interface/Booking";
 import path from 'path';
 import fs from 'fs';
+import cache from "../../util/cache";
 
 const bookingsPath = path.join(__dirname, '..', '..', 'data', 'booking.data.json');
 
@@ -32,10 +33,15 @@ export const getBookingRepo = async () => {
 };
 
 export const updateBookingRepo = async (updatedJSON: string | NodeJS.ArrayBufferView) => {
+    cache.del("getBookings");
+    cache.set("getBookings", updatedJSON);
     return fs.writeFileSync(bookingsPath, updatedJSON);
 };
 
 export const cancelBookingRepo = async (bookingData: any) => {
-    return fs.writeFileSync(bookingsPath, JSON.stringify(bookingData, null, 2));
+    cache.del("getBookings");
+    const updatedJSON = JSON.stringify(bookingData, null, 2);
+    cache.set("getBookings", updatedJSON);
+    return fs.writeFileSync(bookingsPath, updatedJSON);
 
 };
