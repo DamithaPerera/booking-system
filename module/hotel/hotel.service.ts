@@ -13,27 +13,7 @@ import cache from "../../util/cache";
 
 
 export const getAllHotelsService = async (checkIn: string, checkOut: string) => {
-    // Declare the variables before the if statement
-    let Booking: any[] = [];
-    let Hotels: any[] = [];
-
-    // Check the cache first
-    let getHotelCache = cache.get("getHotels");
-    let getBookingCache = cache.get("getBookings");
-
-    if (!getHotelCache || !getBookingCache) {
-        // If the data is not cached, fetch it from the repository
-        let result = await Promise.all([getAllBookingRepo(), getAllHotelsRepo()]);
-        Booking = result[0].Booking;
-        Hotels = result[1].Hotels;
-
-        // Cache the data for future use
-        cache.set("getBookings", Booking);
-        cache.set("getHotels", Hotels);
-    } else {
-        Booking = getBookingCache;
-        Hotels = getHotelCache;
-    }
+    const {Booking, Hotels} = await getCacheForBookingsAndHotels()
 
     // Define the date range to check availability
     const checkInDate = new Date(checkIn);
@@ -58,22 +38,44 @@ export const getAllHotelsService = async (checkIn: string, checkOut: string) => 
 };
 
 export const creatHotelBookingService = async (requestBody: Booking) => {
-    const {Booking} = await getAllBookingRepo();
-    const {Hotels} = await getAllHotelsRepo();
-
-    const hotelObj: Hotel[] = Hotels;
-    const bookingObj: Booking[] = Booking;
-
-    const data = validateBooking(requestBody, hotelObj, bookingObj);
+    const {Booking, Hotels} = await getCacheForBookingsAndHotels()
+    const data = validateBooking(requestBody, Hotels, Booking);
     if (data) {
         requestBody.BookingId = uuidv4();
-        console.log('requestBody', requestBody)
-        await createBookingRepo(requestBody)
+        await createBookingRepo(requestBody);
     }
     return {
         "Booking Id": requestBody.BookingId
     }
 }
+
+
+const getCacheForBookingsAndHotels = async () => {
+    let getHotelCache = cache.get("getHotels");
+    let getBookingCache = cache.get("getBookings");
+
+    let Booking: Booking[] = [];
+    let Hotels: Hotel[] = [];
+
+    if (!getHotelCache || !getBookingCache) {
+        let data = await Promise.all([getAllBookingRepo(), getAllHotelsRepo()]);
+        Booking = data[0].Booking;
+        Hotels = data[1].Hotels;
+
+        cache.set("getBookings", Booking);
+        cache.set("getHotels", Hotels);
+    } else {
+        // @ts-ignore
+        Booking = getBookingCache;
+        // @ts-ignore
+        Hotels = getHotelCache;
+    }
+
+    return {
+        Booking, Hotels
+    }
+
+};
 
 function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[]): boolean {
     const hotel = hotels.find((h) => h.HotelId === booking.HotelId);
