@@ -36,7 +36,7 @@ export const updateHotelBookingController = async (req: Request, res: Response) 
         const data = await updateHotelBookingService(requestBody, +hotelId, +roomId, bookingId)
         return SuccessResponse(res, data, 'Booking Updated Successfully', HttpStatusCode.OK);
     } catch (error) {
-        return ErrorResponse(res, error, HttpStatusCode.BAD_REQUEST);
+        return ErrorResponse(res, {message: error}, HttpStatusCode.BAD_REQUEST);
     }
 }
 
