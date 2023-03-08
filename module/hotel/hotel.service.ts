@@ -83,9 +83,6 @@ export const creatHotelBookingService = async (requestBody: Booking) => {
  * @param bookings
  */
 function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[]) {
-  console.log('1booking=>', booking)
-  console.log('1hotels=>', hotels)
-  console.log('1bookings=>', bookings)
   // Check if the hotel specified in the booking request exists
   const hotel = hotels.find(h => h.HotelId === booking.HotelId);
   if (!hotel) {
@@ -105,7 +102,7 @@ function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[])
     ((new Date(b.CheckIn) >= new Date(booking.CheckIn) && new Date(b.CheckIn) < new Date(booking.CheckOut)) ||
       (new Date(b.CheckOut) > new Date(booking.CheckIn) && new Date(b.CheckOut) <= new Date(booking.CheckOut)))
   );
-  console.log('conflict1', conflictingBooking)
+
   if (conflictingBooking) {
     throw new Error(`Error: Room with ID ${booking.RoomId} in hotel ${booking.HotelId} is not available during the specified date range.`);
   }
@@ -202,7 +199,6 @@ export const getCacheForBookingsAndHotels = async () => {
 
   // If there is no cached data available, fetch data from the repository and store it in cache
   if (!getHotelCache || !getBookingCache) {
-    console.log('cache called')
     // Fetch data for bookings and hotels from the repository
     const [bookingData, hotelsData] = await Promise.all([
       getAllBookingRepo(),
