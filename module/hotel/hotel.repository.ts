@@ -42,8 +42,6 @@ export const createBookingRepo = async (requestBody: Booking) => {
   // Convert the updated bookings data to a JSON string.
   const updatedJSON = JSON.stringify(bookings, null, 2);
 
-  // Add the updated data to the cache.
-  cache.set("getBookings", updatedJSON);
   // Write the updated bookings data to the JSON file.
   fs.writeFileSync(bookingsPath, updatedJSON);
 };
