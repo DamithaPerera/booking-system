@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "build": "tsc && copy data\\booking.data.json dist\\data",
+    "build-dev": "tsc && copy data\\booking.data.json dist\\data",
+    "build-prod": "tsc && cp data/booking.data.json dist/data",
     "start": "node dist/index.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
     "test": "jest"
