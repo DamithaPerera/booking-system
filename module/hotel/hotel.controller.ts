@@ -44,7 +44,7 @@ export const creatHotelBookingController = async (req: Request, res: Response) =
     return SuccessResponse(res, data, "Booking Created Successfully", HttpStatusCode.CREATED);
   } catch (error) {
     // Return the error message as an error response if there is any error
-    return ErrorResponse(res, { message: error }, HttpStatusCode.BAD_REQUEST);
+    return ErrorResponse(res, error, HttpStatusCode.BAD_REQUEST);
   }
 };
 
@@ -65,7 +65,7 @@ export const updateHotelBookingController = async (req: Request, res: Response) 
     return SuccessResponse(res, data, "Booking Updated Successfully", HttpStatusCode.OK);
   } catch (error) {
     // Return the error message as an error response if there is any error
-    return ErrorResponse(res, { message: error }, HttpStatusCode.BAD_REQUEST);
+    return ErrorResponse(res, error, HttpStatusCode.BAD_REQUEST);
   }
 };
 
@@ -84,6 +84,6 @@ export const cancelHotelBookingController = async (req: Request, res: Response) 
     return SuccessResponse(res, data, "Booking Canceled Successfully", HttpStatusCode.OK);
   } catch (error) {
     // Return the error message as an error response if there is any error
-    return ErrorResponse(res, { message: error }, HttpStatusCode.BAD_REQUEST);
+    return ErrorResponse(res, error, HttpStatusCode.BAD_REQUEST);
   }
 };
