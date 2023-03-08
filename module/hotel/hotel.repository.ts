@@ -30,6 +30,8 @@ export const getAllBookingRepo = async () => {
  * @param requestBody
  */
 export const createBookingRepo = async (requestBody: Booking) => {
+  // Remove the old data from the cache.
+  cache.del("getBookings");
   // Read the bookings data from the JSON file.
   const bookingsJSON = fs.readFileSync(bookingsPath, "utf-8");
   // Convert the JSON string to an array of objects.
