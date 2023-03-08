@@ -106,7 +106,7 @@ function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[])
       (new Date(b.CheckOut) > new Date(booking.CheckIn) && new Date(b.CheckOut) <= new Date(booking.CheckOut)))
   );
   console.log('conflict1', conflictingBooking)
-  if (conflictingBooking || conflictingBooking === undefined) {
+  if (conflictingBooking) {
     throw new Error(`Error: Room with ID ${booking.RoomId} in hotel ${booking.HotelId} is not available during the specified date range.`);
   }
 
