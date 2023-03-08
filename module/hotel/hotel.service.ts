@@ -88,14 +88,12 @@ function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[])
   console.log('1bookings=>', bookings)
   // Check if the hotel specified in the booking request exists
   const hotel = hotels.find(h => h.HotelId === booking.HotelId);
-  console.log('hotels=>', hotels)
   if (!hotel) {
     throw new Error(`Error: Hotel with ID ${booking.HotelId} does not exist.`);
   }
 
   // Check if the room specified in the booking request exists within the specified hotel
   const room = hotel.Rooms.find(r => r.RoomId === booking.RoomId);
-  console.log('room=>', room)
   if (!room) {
     throw new Error(`Error: Room with ID ${booking.RoomId} does not exist in hotel ${booking.HotelId}.`);
   }
@@ -203,6 +201,7 @@ export const getCacheForBookingsAndHotels = async () => {
 
   // If there is no cached data available, fetch data from the repository and store it in cache
   if (!getHotelCache || !getBookingCache) {
+    console.log('cache called')
     // Fetch data for bookings and hotels from the repository
     const [bookingData, hotelsData] = await Promise.all([
       getAllBookingRepo(),

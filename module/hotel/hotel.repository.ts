@@ -18,8 +18,10 @@ export const getAllHotelsRepo = async () => {
  * Returns all booking data by reading from a JSON file.
  */
 export const getAllBookingRepo = async () => {
+  console.log('bookingsPath', bookingsPath)
   // Read the bookings data from the JSON file.
   const bookingsJSON = fs.readFileSync(bookingsPath, "utf-8");
+  console.log('bookingsJSON', JSON.parse(bookingsJSON))
   // Convert the JSON string to an array of objects and return it
   return JSON.parse(bookingsJSON);
 };
