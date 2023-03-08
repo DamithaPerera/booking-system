@@ -99,7 +99,8 @@ function validateBooking(booking: Booking, hotels: Hotel[], bookings: Booking[])
   }
 
   // Check if the requested room is available during the requested date range
-  const conflictingBooking = bookings.find(b =>
+  const bookingsArray = Array.from(bookings);
+  const conflictingBooking = bookingsArray.find(b =>
     b.HotelId === booking.HotelId &&
     b.RoomId === booking.RoomId &&
     ((new Date(b.CheckIn) >= new Date(booking.CheckIn) && new Date(b.CheckIn) < new Date(booking.CheckOut)) ||
